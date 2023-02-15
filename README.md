@@ -408,3 +408,8 @@ You can also adjust the other values, such as `port`, `maxretry`,`ignoreip`, and
     ```
 
 `This will prevent incoming ping requests to your server and ensure that pinging is not allowed.`
+
+
+
+
+# Limiting User Privileges:
