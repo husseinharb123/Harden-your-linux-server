@@ -396,20 +396,58 @@ You can also adjust the other values, such as `port`, `maxretry`,`ignoreip`, and
     ```
     sudo ufw reload 
     ```  
-## block incoming ICMP (ping) requests 
-1. enter the following command:
+## block incoming ICMP (ping) requests  Using iptables
+
+### Iptables is a firewall utility in Linux that controls incoming and outgoing traffic based on certain rules . Ping works by sending an ICMP packet (Echo request) to the destination system and then receives a response ICMP packet (Echo reply).In order to block ping requests, you will need to ignore/block the ICMP echo requests that are sent to your server.
+
+1. install `iptable`  using the following command in Terminal:
 
     ```
-    sudo ufw deny in to any from any proto icmp
-    ```
-2. to apply the changes, enter:
-    ``` 
-    sudo ufw reload
+    sudo apt install iptables
     ```
 
-`This will prevent incoming ping requests to your server and ensure that pinging is not allowed.`
+
+2. To block ping requests to your system, type the following command in Terminal:
+
+    ```
+    sudo iptables -A INPUT -p icmp --icmp-type 8 -j REJECT
+    ```
+
+    `The "A" flag is used to add a rule in iptables, and the "icmp-type 8" is the ICMP type number used for an echo request. By adding this rule, anyone sending a ping request to your system will see a "Destination Port Unreachable" message.`
+
+- If you don't want this message to appear, use the following command instead:
+
+    ```
+    sudo iptables -A INPUT -p icmp --icmp-type 8 -j DROP
+    ```
 
 
 
+- To unblock ping requests to your system, use the following command:
 
-# Limiting User Privileges:
+    ```
+    sudo iptables -D INPUT -p icmp --icmp-type 8 -j REJECT
+    ```
+    `The "D" flag is used to delete a rule in iptables, and the "icmp-type 8" is the ICMP type number used for an echo request.`
+
+- If you want to make these rules persistent after a system reboot, you will need to install the iptables-persistent package and After adding or deleting any rule you shoud run the following commands in Terminal to make them survive the system reboot:
+    ```
+    sudo apt install iptables-persistent
+    sudo netfilter-persistent save
+    sudo netfilter-persistent reload
+    ```
+
+- To view all the rules added to your iptables, use the following command:
+
+    ```
+    sudo iptables -L
+    ```
+
+
+
+# Limiting User Privileges: using chmod and chown
+
+# lock the root account 
+``` 
+sudo usermod -L root
+```
